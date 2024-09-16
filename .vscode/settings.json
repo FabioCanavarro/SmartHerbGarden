@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "*.embeddedhtml": "html",
+        "MLTable": "yaml",
+        "cmath": "cpp"
+    }
+}
