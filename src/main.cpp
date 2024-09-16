@@ -1,19 +1,38 @@
 #include <Arduino.h>
 #include "DHT.h"
 #include <LiquidCrystal_I2C.h>
+#include <TimeLib.h>
 #define DHTPIN D3     // what pin we're connected to
-#define DHTTYPE DHT22   // DHT 22  (AM2302)
+const int HYGROGENATOR_PIN = A0; 
+
+
+const int needed_air_temp= 26; //adjustable
+const int needed_soil_temp = 29; //adjustable
+const int needed_humidity_percentage = 60; //adjustable
+const int needed_moisture_percentage = 70; //adjustable
+
+int currentsecond;
+int tempsecond = 1800;//some delay before spraying
+const int duration_before_fertlizer_in_hours=1 ;
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
-DHT dht(DHTPIN, DHTTYPE);
+/*
+*SCL = D1
+*SDA = D2
+*VCC = 5V
+*GND = GND
+*/
 
+
+
+DHT dht(DHTPIN, DHT22);
 const int AirValue = 561;   //replace the value with value when placed in air using calibration code 
 const int WaterValue = 310; //replace the value with value when placed in water using calibration code 
 int soilMoistureValue = 0;
 int soilmoisturepercent=0;
 
 int read_hygrometer(){
-  soilMoistureValue = analogRead(A0);  //put Sensor insert into soil
+  soilMoistureValue = analogRead(HYGROGENATOR_PIN);  //put Sensor insert into soil
   Serial.println(soilMoistureValue);
   soilmoisturepercent = map(soilMoistureValue, AirValue, WaterValue, 0, 100);
 
@@ -55,10 +74,10 @@ delay(1000);
 
 void loop() 
 {
+  currentsecond= second();
   // Wait a few seconds between measurements.
-delay(3500);
+delay(3000);
 lcd.clear();
-
 float hum = dht.readHumidity();
 float tempC = dht.readTemperature();
 
@@ -85,4 +104,92 @@ lcd.clear();
 lcd.setCursor(0,0);
 lcd.print("moisture: ");
 lcd.print(moisturelevel);
+
+/*
+    *TODO: soil temp
+*/
+
+
+if (((currentsecond - tempsecond) /3600) >= duration_before_fertlizer_in_hours)
+{
+  /*
+    this is where the code for spraying it will be
+    turn on spray
+  */
+  lcd.clear();
+  lcd.print("Spraying fertilizer.");
+  delay(1000);
+
+  lcd.clear();
+  lcd.print("Spraying fertilizer..");
+  delay(1000);
+
+  lcd.clear();
+  lcd.print("Spraying fertilizer...");
+  tempsecond = currentsecond;
+  /*
+    this is where the code for spraying it will be
+    turn off spray
+  */
+}
+
+if (moisturelevel < needed_moisture_percentage){
+  /*
+    this is where the code for spraying it will be
+    turn on spray
+  */
+  lcd.clear();
+  lcd.print("Spraying water.");
+  delay(1000);
+
+  lcd.clear();
+  lcd.print("Spraying water..");
+  delay(1000);
+
+  lcd.clear();
+  lcd.print("Spraying water...");
+  /*
+    this is where the code for spraying it will be
+    turn off spray
+  */
+  delay(250);
+  int moisturelevel = read_hygrometer();
+}
+if (tempC < needed_air_temp){
+  /*
+    Growlight
+  */
+
+  delay(3000);
+  float tempC = dht.readTemperature();
+}
+else if (tempC > needed_air_temp){
+  /*
+    turn off growlight
+    turn on ultrasonic atomizer humidifier for 3 sec
+  */
+  delay(3000);
+  float tempC = dht.readTemperature();
+}
+/*
+    soil temp rebound *TODO: havent been make
+*/
+
+
+
+if (hum < needed_humidity_percentage){
+  /*
+  turn on ultrasonic atomizer humidifier
+  */
+  delay(3000);
+  float hum = dht.readHumidity();
+}
+else if (hum > needed_humidity_percentage){
+  /*
+  turn off ultrasonic atomizer humidifier
+  turn on grow light
+  */
+  delay(3000);
+  float hum = dht.readHumidity();
+}
 }
