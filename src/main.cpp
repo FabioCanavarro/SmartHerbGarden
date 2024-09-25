@@ -10,9 +10,9 @@ const int DB18S20 = D4;
 
 // output pins
 const int UAH = D5;
-const int water_trasnsitor = D8;
-const int fertilizer_transistor = D0;
-const int growlight = D7;
+const int water_pump = D8;
+const int fertilizer_pump = D7;
+const int growlight = D0;
 
 
 
@@ -75,6 +75,7 @@ int read_hygrometer(){
 
 void setup() 
 {
+  pinMode(growlight,HIGH);
 Serial.begin(115200); 
 dht.begin();
 lcd.begin(16,2);
@@ -156,7 +157,7 @@ if (moisturelevel < needed_moisture_percentage){
   delay(1000);
 
   lcd.clear();
-  lcd.print("Spraying water..");
+  lcd.print("Spraying water..");  
   delay(1000);
 
   lcd.clear();
