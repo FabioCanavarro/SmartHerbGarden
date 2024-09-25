@@ -2,14 +2,27 @@
 #include "DHT.h"
 #include <LiquidCrystal_I2C.h>
 #include <TimeLib.h>
-#define DHTPIN D3     // what pin we're connected to
-const int HYGROGENATOR_PIN = A0; 
+/* initiating the pins*/
+// receiving pin
+const int DHTPIN = D3;     
+const int HYGROGENATOR_PIN = D6; 
+const int DB18S20 = D4;
+
+// output pins
+const int UAH = D5;
+const int water_trasnsitor = D8;
+const int fertilizer_transistor = D0;
+const int growlight = D7;
 
 
+
+
+// needed config for HYGROGENATOR
 const int needed_air_temp= 26; //adjustable
 const int needed_soil_temp = 29; //adjustable
 const int needed_humidity_percentage = 60; //adjustable
 const int needed_moisture_percentage = 70; //adjustable
+
 
 int currentsecond;
 int tempsecond = 1800;//some delay before spraying
